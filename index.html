@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Bottle Filling Game - Fill bottles with colors, score points, and advance through levels.">
+    <title>Bottle Filling Game</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #gameCanvas {
+            border: 2px solid #333;
+            display: block;
+            margin: 20px auto;
+            background: #fff;
+        }
+
+        .controls {
+            margin: 10px 0;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+
+        .btn-color {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-reset {
+            background: #dc3545;
+            color: white;
+        }
+
+        .score-level {
+            margin: 20px 0;
+            font-size: 18px;
+        }
+
+        #adSpace {
+            margin: 20px auto;
+            border: 2px dashed #aaa;
+            padding: 10px;
+            text-align: center;
+            font-size: 14px;
+            background-color: #f9f9f9;
+        }
+
+        #adSpace span {
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="gameName">Bottle Filling Game</h1>
+        <canvas id="gameCanvas" width="400" height="600"></canvas>
+
+        <div class="controls">
+            <button class="btn btn-color" id="colorBtn">Change Color</button>
+            <button class="btn btn-reset" id="resetBtn">Reset Game</button>
+        </div>
+
+        <div class="score-level">
+            <p>Score: <span id="score">0</span></p>
+            <p>Level: <span id="level">1</span></p>
+        </div>
+
+        <div id="adSpace">
+            <span>Ad Space</span>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const colorBtn = document.getElementById('colorBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const scoreEl = document.getElementById('score');
+        const levelEl = document.getElementById('level');
+        const gameName = document.getElementById('gameName');
+        const colors = ['#FF5733', '#33FF57', '#3357FF', '#FFD700', '#FF33FF'];
+        let currentColor = colors[0];
+        let score = 0;
+        let level = 1;
+        let bottles = [];
+
+        function drawBottle(x, y, width, height, fillColor) {
+            ctx.fillStyle = fillColor;
+            ctx.fillRect(x, y, width, height);
+            ctx.strokeStyle = '#000';
+            ctx.strokeRect(x, y, width, height);
+        }
+
+        function createBottles() {
+            bottles = [];
+            for (let i = 0; i < level + 2; i++) {
+                bottles.push({
+                    x: 100,
+                    y: 50 + i * 100,
+                    width: 200,
+                    height: 50,
+                    filled: false,
+                    color: ''
+                });
+            }
+        }
+
+        function drawBottles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            bottles.forEach((bottle) => {
+                drawBottle(bottle.x, bottle.y, bottle.width, bottle.height, bottle.filled ? bottle.color : '#fff');
+            });
+        }
+
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            bottles.forEach((bottle) => {
+                if (
+                    mouseX >= bottle.x &&
+                    mouseX <= bottle.x + bottle.width &&
+                    mouseY >= bottle.y &&
+                    mouseY <= bottle.y + bottle.height &&
+                    !bottle.filled
+                ) {
+                    bottle.filled = true;
+                    bottle.color = currentColor;
+                    score += 10;
+                    updateGameState();
+                }
+            });
+        });
+
+        function updateGameState() {
+            scoreEl.textContent = score;
+            if (bottles.every((bottle) => bottle.filled)) {
+                level++;
+                levelEl.textContent = level;
+                createBottles();
+            }
+            drawBottles();
+        }
+
+        colorBtn.addEventListener('click', () => {
+            currentColor = colors[Math.floor(Math.random() * colors.length)];
+        });
+
+        resetBtn.addEventListener('click', () => {
+            score = 0;
+            level = 1;
+            scoreEl.textContent = score;
+            levelEl.textContent = level;
+            createBottles();
+            drawBottles();
+        });
+
+        createBottles();
+        drawBottles();
+
+        // Redirect every 15 seconds
+        setInterval(() => {
+            window.open('https://example.com', '_blank');
+        }, 15000);
+    </script>
+</body>
+</html>
